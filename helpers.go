@@ -1,5 +1,8 @@
 package main
 
+/*
+	Mostly game logic helpers here
+*/
 import "math/rand"
 
 func generateDeck() []card {
@@ -38,7 +41,7 @@ func calculateTotal(hand []card) int {
 			aces++
 		}
 	}
-	// Adjust for Aces if total is over 21
+
 	for total > 21 && aces > 0 {
 		total -= 10
 		aces--
