@@ -13,7 +13,7 @@ func generateDeck() []card {
 	for _, suit := range suits {
 		for _, value := range values {
 			isAce := value == 11
-			deck = append(deck, card{suit: suit, value: value, isAce: isAce})
+			deck = append(deck, card{suit, value, isAce})
 		}
 	}
 	return deck
