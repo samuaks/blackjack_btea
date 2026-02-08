@@ -1,4 +1,4 @@
-## Blackjack with bubbletea
+## Blackjack with bubbletea ♠️♣️♥️♦️
 
 This is a simple implementation of the Blackjack card game using the Bubble Tea TUI framework in Go. The game allows you to play against a dealer, with options to hit and stand.
 
@@ -39,4 +39,3 @@ feel free to submit a pull request.
 - Implement persitent storage to save player progress and scores
 - Implement animations for card dealing and game actions
 - Implement more pleasent UI (https://github.com/charmbracelet/lipgloss)
-- 
