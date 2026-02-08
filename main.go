@@ -44,9 +44,8 @@ func (g game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "h":
-			if len(g.cards) > 0 {
-				// pre check for bust
+		case " ":
+			if len(g.cards) > 0 && !g.gameOver {
 				testHand := append(g.hand, g.cards[0])
 				if checkBust(testHand) {
 					g.gameOver = true
@@ -57,18 +56,26 @@ func (g game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			g.turn++
 		case "s":
-			if len(g.cards) > 0 {
-				testHand := append(g.house, g.cards[0])
-				if checkBust(testHand) {
+			for calculateTotal(g.house) < 17 && len(g.cards) > 0 {
+				testhand := append(g.house, g.cards[0])
+				if checkBust(testhand) {
 					g.gameOver = true
 					g.playerWon = true
 				}
-				if calculateTotal(g.house) < 17 {
-					g.house = append(g.house, g.cards[0])
-					g.cards = g.cards[1:]
+				g.house = append(g.house, g.cards[0])
+				g.cards = g.cards[1:]
+				if !g.gameOver {
+					playerTotal := calculateTotal(g.hand)
+					houseTotal := calculateTotal(g.house)
+					g.gameOver = true
+					g.playerWon = playerTotal > houseTotal
+				} else {
+					break
 				}
 			}
 			g.turn++
+		case "r":
+			return initialGame(), tea.ClearScreen
 		case "ctrl+c", "q":
 			return g, tea.Quit
 		}
@@ -79,9 +86,9 @@ func (g game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (g game) View() string {
 	if g.gameOver {
 		if !g.playerWon {
-			return fmt.Sprintf("You busted with %d! House wins.\nPress 'q' to quit.", calculateTotal(g.hand))
+			return fmt.Sprintf("You busted with %d! House wins with %d.\nPress 'r' to restart or 'q' to quit.", calculateTotal(g.hand), calculateTotal(g.house))
 		}
-		return fmt.Sprintf("You win with %d! House had %d.\nPress 'q' to quit.", calculateTotal(g.hand), calculateTotal(g.house))
+		return fmt.Sprintf("You win with %d! House had %d.\nPress 'r' to restart or 'q' to quit.", calculateTotal(g.hand), calculateTotal(g.house))
 	}
 	total := calculateTotal(g.hand)
 	house := calculateTotal(g.house)
@@ -91,7 +98,7 @@ func (g game) View() string {
 	for _, card := range g.hand {
 		view += fmt.Sprintf("%s %d\n", card.suit, card.value)
 	}
-	view += "\nPress 'h' to hit, 's' to stand, 'q' to quit."
+	view += "\nPress 'space' to hit, 's' to stand, 'q' to quit."
 	return view
 }
 
