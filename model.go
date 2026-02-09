@@ -105,6 +105,9 @@ func (g game) View() string {
 	for _, card := range g.hand {
 		view += fmt.Sprintf("%s %d\n", card.suit, card.value)
 	}
+	//for _, card := range g.house {
+	view += fmt.Sprintf("%s %d\n", card.suit, card.value)
+	//}
 	view += "\nPress 'space' to hit, 's' to stand, 'q' to quit."
 	return styles.Render(view)
 }
