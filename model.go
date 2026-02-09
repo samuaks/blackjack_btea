@@ -93,9 +93,9 @@ func (g game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (g game) View() string {
 	if g.gameOver {
 		if !g.playerWon {
-			return fmt.Sprintf("You busted with %d! House wins with %d.\nPress 'r' to restart or 'q' to quit.", calculateTotal(g.hand), calculateTotal(g.house))
+			return styles.Render(fmt.Sprintf("You busted with %d! House wins with %d.\nPress 'r' to restart or 'q' to quit.", calculateTotal(g.hand), calculateTotal(g.house)))
 		}
-		return fmt.Sprintf("You win with %d! House had %d.\nPress 'r' to restart or 'q' to quit.", calculateTotal(g.hand), calculateTotal(g.house))
+		return styles.Render(fmt.Sprintf("You win with %d! House had %d.\nPress 'r' to restart or 'q' to quit.", calculateTotal(g.hand), calculateTotal(g.house)))
 	}
 	total := calculateTotal(g.hand)
 	house := calculateTotal(g.house)
@@ -106,5 +106,5 @@ func (g game) View() string {
 		view += fmt.Sprintf("%s %d\n", card.suit, card.value)
 	}
 	view += "\nPress 'space' to hit, 's' to stand, 'q' to quit."
-	return view
+	return styles.Render(view)
 }
