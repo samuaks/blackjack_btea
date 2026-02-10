@@ -35,6 +35,8 @@ feel free to submit a pull request.
 
 ### Features to add
 - Implement a score system to keep track of wins and losses
+- Change the game view into uniform cards instead of text representations
+- Add clear header in view in which the result of the game can be displayed after game is over without needing for a complete redraw of the screen
 - Implement logic for Splitting
 - Implement persitent storage to save player progress and scores
 - Implement animations for card dealing and game actions
