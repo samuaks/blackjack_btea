@@ -53,36 +53,34 @@ func (g game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case " ":
 			if len(g.cards) > 0 && !g.gameOver {
-				testHand := append(g.hand, g.cards[0])
-				if checkBust(testHand) {
+
+				g.hand = append(g.hand, g.cards[0])
+				g.cards = g.cards[1:]
+				if checkBust(g.hand) {
 					g.gameOver = true
 					g.playerWon = false
 				}
-				g.hand = append(g.hand, g.cards[0])
-				g.cards = g.cards[1:]
 			}
 			g.turn++
 		case "s":
 			for calculateTotal(g.house) < 17 && len(g.cards) > 0 {
-				testhand := append(g.house, g.cards[0])
-				if checkBust(testhand) {
-					g.gameOver = true
-					g.playerWon = true
-				}
 				g.house = append(g.house, g.cards[0])
 				g.cards = g.cards[1:]
-				if !g.gameOver {
-					playerTotal := calculateTotal(g.hand)
-					houseTotal := calculateTotal(g.house)
+				if checkBust(g.house) {
 					g.gameOver = true
-					g.playerWon = playerTotal > houseTotal
-				} else {
-					break
+					g.playerWon = true
+					return g, nil
 				}
 			}
+			total := calculateTotal(g.hand)
+			house := calculateTotal(g.house)
+			g.gameOver = true
+			g.playerWon = total > house
 			g.turn++
 		case "r":
-			return initialGame(), tea.ClearScreen
+			if g.gameOver {
+				return initialGame(), tea.ClearScreen
+			}
 		case "ctrl+c", "q":
 			return g, tea.Quit
 		}
@@ -92,11 +90,16 @@ func (g game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (g game) View() string {
 	if g.gameOver {
+		var gameOverMsg string
 		if !g.playerWon {
-			return styles.Render(fmt.Sprintf("You busted with %d! House wins with %d.\nPress 'r' to restart or 'q' to quit.", calculateTotal(g.hand), calculateTotal(g.house)))
+			gameOverMsg = fmt.Sprintf("🤯 BUST! You busted with %d\n🏠 House wins with %d.", calculateTotal(g.hand), calculateTotal(g.house))
+		} else {
+			gameOverMsg = fmt.Sprintf("🎉 You win with %d!\n🏠 House had %d.", calculateTotal(g.hand), calculateTotal(g.house))
 		}
-		return styles.Render(fmt.Sprintf("You win with %d! House had %d.\nPress 'r' to restart or 'q' to quit.", calculateTotal(g.hand), calculateTotal(g.house)))
+		gameOverMsg += "\n\nPress 'r' to play again or 'q' to quit."
+		return styles.Render(gameOverMsg)
 	}
+
 	total := calculateTotal(g.hand)
 	house := calculateTotal(g.house)
 	view := ""

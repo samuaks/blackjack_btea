@@ -9,6 +9,6 @@ var (
 		Bold(true).
 		Padding(1, 2).
 		Border(lipgloss.RoundedBorder()).
-		BorderForeground(lipgloss.Color("#FF0000")).
+		BorderForeground(lipgloss.Color("#1a1313")).
 		Align(lipgloss.Left)
 )
