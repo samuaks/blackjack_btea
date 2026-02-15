@@ -20,6 +20,18 @@ type card struct {
 	isAce bool
 }
 
+type score struct {
+	wins  int
+	games int
+}
+
+func (s *score) update(playerWon bool) {
+	s.games++
+	if playerWon {
+		s.wins++
+	}
+}
+
 type game struct {
 	cards     []card
 	hand      []card
@@ -27,18 +39,31 @@ type game struct {
 	turn      int
 	gameOver  bool
 	playerWon bool
+	score     score
 }
 
-func initialGame() game {
+func (g game) startGame(fresh bool) game {
 	initialDeck := shuffleDeck(generateDeck())
 	initialPlayerHand := []card{initialDeck[0], initialDeck[1]}
 	initialHouseHand := []card{initialDeck[2]}
 	initialDeck = initialDeck[3:]
-	return game{
-		cards: initialDeck,
-		hand:  initialPlayerHand,
-		house: initialHouseHand,
-		turn:  0,
+	if fresh {
+		return game{
+			cards: initialDeck,
+			hand:  initialPlayerHand,
+			house: initialHouseHand,
+			turn:  0,
+		}
+	} else {
+		return game{
+			cards:     initialDeck,
+			hand:      initialPlayerHand,
+			house:     initialHouseHand,
+			turn:      0,
+			score:     g.score,
+			playerWon: false,
+			gameOver:  false,
+		}
 	}
 }
 
@@ -59,6 +84,8 @@ func (g game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if checkBust(g.hand) {
 					g.gameOver = true
 					g.playerWon = false
+					g.score.update(g.playerWon)
+
 				}
 			}
 			g.turn++
@@ -69,6 +96,7 @@ func (g game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if checkBust(g.house) {
 					g.gameOver = true
 					g.playerWon = true
+					g.score.update(g.playerWon)
 					return g, nil
 				}
 			}
@@ -76,10 +104,11 @@ func (g game) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			house := calculateTotal(g.house)
 			g.gameOver = true
 			g.playerWon = total > house
+			g.score.update(g.playerWon)
 			g.turn++
 		case "r":
 			if g.gameOver {
-				return initialGame(), tea.ClearScreen
+				return g.startGame(false), tea.ClearScreen
 			}
 		case "ctrl+c", "q":
 			return g, tea.Quit
@@ -96,6 +125,8 @@ func (g game) View() string {
 		} else {
 			gameOverMsg = fmt.Sprintf("🎉 You win with %d!\n🏠 House had %d.", calculateTotal(g.hand), calculateTotal(g.house))
 		}
+		//gameOverMsg += fmt.Sprintf("\n\nYour score is %d/%d", g.score.wins, g.score.games)
+		gameOverMsg += fmt.Sprintf("\n\nWins: %d \t Win rate: %.2f%%", g.score.wins, float64(g.score.wins)/float64(g.score.games)*100)
 		gameOverMsg += "\n\nPress 'r' to play again or 'q' to quit."
 		return styles.Render(gameOverMsg)
 	}

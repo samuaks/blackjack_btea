@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	if _, err := tea.NewProgram(initialGame()).Run(); err != nil {
+	newGame := game{}
+	if _, err := tea.NewProgram(newGame.startGame(true)).Run(); err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
